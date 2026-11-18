@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08111f">
+  <meta name="description" content="NNBW Videoarchiv – eine private Video- und Gaming-Plattform mit Warzone-Videos, Gaming-Clips und synchronisierter Wiedergabe.">
+  <title>VOD/HUB</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 25px; 
+        width: 100%;
+        position: relative;
+        margin-bottom: 20px;
+    }
+    .header h1 {
+        margin: 0;
+        text-align: center;
+        font-size: 2.2rem;
+    }
+    .header .status {
+        position: relative; 
+        right: auto;
+        top: auto;
+        transform: none;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+    .header .status.online {
+        background-color: rgba(46, 204, 113, 0.1);
+        border: 1px solid #2ecc71;
+        box-shadow: 0 0 15px rgba(46, 204, 113, 0.25);
+        color: #2ecc71;
+    }
+    .header .status.online::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        background-color: #2ecc71;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 8px #2ecc71;
+        animation: status-pulse-online 2s infinite ease-in-out;
+    }
+    .header .status.offline {
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid #e74c3c;
+        box-shadow: 0 0 15px rgba(231, 76, 60, 0.25);
+        color: #e74c3c;
+    }
+    .header .status.offline::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        background-color: #e74c3c;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 8px #e74c3c;
+        animation: status-pulse-offline 2s infinite ease-in-out;
+    }
+    @keyframes status-pulse-online {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 12px #2ecc71; }
+        100% { transform: scale(0.9); opacity: 0.7; }
+    }
+    @keyframes status-pulse-offline {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 12px #e74c3c; }
+        100% { transform: scale(0.9); opacity: 0.7; }
+    }
+    .page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    .main-content-row {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start; 
+        justify-content: space-between; 
+        gap: 50px; 
+        width: 100%;
+        max-width: 1700px; 
+        margin-top: 15px;
+        padding: 0 30px;
+    }
+    .card {
+        flex: 1;
+        max-width: 1250px; 
+        width: 100%;
+        margin: 0 !important; 
+    }
+    .video-frame video {
+        pointer-events: none;
+    }
+    .playlist-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 400px; 
+        flex-shrink: 0;
+    }
+    .next-label {
+        margin: 0 0 6px;
+        color: #61e7f5;
+        font: 700 10px Consolas,monospace;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+    .next-card {
+        background: rgba(17, 31, 50, 0.45);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid #29425b;
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column; 
+        gap: 14px;
+        width: 100%;
+        pointer-events: none; 
+        cursor: default;       
+        margin-top: 0 !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    .next-thumb-wrapper {
+        position: relative;
+        width: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #29425b;
+        background-color: #000;
+    }
+    .next-card img,
+    .next-card video {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        display: block;
+    }
+    .playlist-item-duration {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #ffffff;
+        background-color: rgba(0, 5, 15, 0.75);
+        backdrop-filter: blur(4px);
+        padding: 3px 6px;
+        border-radius: 4px;
+        flex-shrink: 0;
+        font-family: 'Roboto Mono', Consolas, monospace;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .playlist-item-info {
+        display: flex;
+        width: 100%;
+        padding: 2px 4px;
+    }
+    .next-card h2 {
+        margin: 0;
+        font-size: 1rem !important; 
+        font-weight: 600;
+        color: #ffffff;
+        white-space: normal !important; 
+        word-break: break-word; 
+        line-height: 1.4;
+        width: 100%;
+    }
+    .time-overlay {
+        position: absolute;
+        left: 16px;
+        bottom: 16px;
+        color: #ffffff;
+        background: rgba(0, 5, 15, 0.55);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        font-family: 'Roboto Mono', 'Segoe UI Mono', Consolas, monospace;
+        pointer-events: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+    .player-controls {
+        position: absolute;
+        right: 16px;
+        bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 8px;
+        border-radius: 24px;
+        background: rgba(0, 5, 15, 0.55);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+    .player-controls button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.85);
+        cursor: pointer;
+        padding: 0;
+        transition: background 0.2s, color 0.2s, transform 0.1s;
+    }
+    .player-controls button:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: #61e7f5 !important;
+        transform: scale(1.05);
+    }
+    .player-controls button svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+    .player-controls button span {
+        display: none;
+    }
+    .player-controls input[type=range] {
+        width: 86px;
+        accent-color: #61e7f5;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.2);
+        height: 4px;
+        border-radius: 2px;
+    }
+    .time-overlay, .player-controls {
+        opacity: 1;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+        visibility: visible;
+    }
+    .video-frame.hide-controls {
+        cursor: none;
+    }
+    .video-frame.hide-controls .time-overlay,
+    .video-frame.hide-controls .player-controls {
+        opacity: 0;
+        visibility: hidden;
+    }
+    @media (max-width: 1350px) {
+        .header {
+            flex-direction: column;
+            gap: 10px;
+        }
+        .main-content-row {
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+        .card {
+            max-width: 100%;
+        }
+        .playlist-sidebar {
+            width: 100%;
+            max-width: 600px;
+        }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <h1>NNBW Videoarchiv</h1>
+      <div class="header-badges">
+        <span class="status online" id="status">Server Online</span>
+        <span class="latency-badge latency-good" id="latency" aria-live="polite">• LATENCY: --ms</span>
+      </div>
+    </header>
+    <div class="main-content-row">
+        <section class="card">
+          <div class="card-head"><h2 id="video-name">__VIDEO_NAME__</h2></div>
+          <div class="video-frame">
+            __VIDEO_ELEMENT__
+            <button id="start-video-button" class="start-video-button" type="button" hidden>Video starten</button>
+            <!-- Player-Steuerung -->
+            <div class="time-overlay" id="time">00:00:00 / --:--:--</div>
+            <div class="player-controls" aria-label="Lautstärke">
+              <button id="mute-button" type="button" aria-label="Ton umschalten">
+                <svg id="icon-mute" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM12 4L9.91 6.09 12 8.18V4zm-8.27-.27L2.35 5.11 7.24 10H4v4h3l4 4v-5.18l4.47 4.47c-.6.4-1.28.71-2.02.89v2.01c1.28-.27 2.44-.87 3.39-1.69l2.75 2.75 1.41-1.41L3.73 3.73z"/></svg>
+                <span>Ton an</span>
+              </button>
+              <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0" aria-label="Lautstärke">
+              <button id="fullscreen-button" type="button" aria-label="Vollbild umschalten">
+                <svg id="icon-fullscreen" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                <span>Vollbild</span>
+              </button>
+            </div>
+          </div>
+        </section>
+        
+        <div class="playlist-sidebar">
+          <p class="next-label">ALS NÄCHSTES</p>
+          <section class="next-card" id="next-card">
+            <div class="next-thumb-wrapper">
+              <img id="next-thumb" alt="Vorschau des nächsten Videos">
+              <div class="playlist-item-duration" id="playlist-next-duration">--:--:--</div>
+            </div>
+            <div class="playlist-item-info">
+              <h2 id="next-name">Lade Video-Daten...</h2>
+            </div>
+          </section>
+        </div>
+    </div>
+    <section id="admin-menu" class="admin-menu" hidden aria-labelledby="admin-title">
+      <div class="admin-heading">
+        <div>
+          <h2 id="admin-title">Admin-Einstellungen</h2>
+          <p>Nur auf diesem PC sichtbar. Tastenkürzel: Strg + Alt + A</p>
+        </div>
+        <button id="admin-close-button" class="admin-close-button" type="button" aria-label="Adminbereich schließen">×</button>
+      </div>
+      <div class="admin-dashboard">
+        <div class="admin-section">
+          <h3>Wiedergabe</h3>
+          <div class="admin-actions">
+            <button id="admin-previous-btn" class="admin-secondary-btn" type="button">Vorheriges Video</button>
+            <button id="admin-next-btn" class="admin-next-btn" type="button">Nächstes Video</button>
+            <button id="admin-shuffle-btn" class="admin-secondary-btn" type="button">Playlist neu mischen</button>
+          </div>
+          <div class="admin-select-row">
+            <select id="admin-video-select" aria-label="Video auswählen"><option value="">Bestimmtes Video auswählen ...</option></select>
+            <button id="admin-select-btn" class="admin-secondary-btn" type="button">Abspielen</button>
+            <button id="admin-reload-btn" class="admin-secondary-btn" type="button">Videos neu einlesen</button>
+          </div>
+        </div>
+        <div class="admin-section">
+          <h3>Serverstatus</h3>
+          <div class="admin-stat-grid">
+            <div class="admin-stat-card admin-online-card"><span>Verbindungsstatus</span><strong id="admin-online"><i class="status-dot"></i> —</strong></div>
+            <div class="admin-stat-card"><span>Aktuelles Video</span><strong id="admin-current">—</strong></div>
+            <div class="admin-stat-card"><span>Anzahl aller Videos</span><strong id="admin-video-count">—</strong></div>
+            <div class="admin-stat-card"><span>Verbundene Zuschauer</span><strong id="admin-viewers">—</strong></div>
+            <div class="admin-stat-card"><span>Server läuft seit</span><strong id="admin-uptime">—</strong></div>
+          </div>
+        </div>
+        <div class="admin-section admin-viewers-section">
+          <div class="section-heading-row"><h3>Aktive Zuschauer</h3><span id="admin-viewers-live" class="live-badge"><i></i> LIVE</span></div>
+          <div class="viewer-table-wrap">
+            <table class="viewer-table">
+              <thead><tr><th>Zuschauer</th><th>IP</th><th>Verbunden seit</th><th>Dauer</th><th>Zuletzt aktiv</th><th>Browser</th></tr></thead>
+              <tbody id="admin-viewer-list"><tr><td colspan="6" class="empty-viewers">Noch keine aktiven Zuschauer.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="admin-section admin-errors-section">
+          <h3>Letzte Serverfehler</h3>
+          <pre id="admin-errors">Keine Fehler erfasst.</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="/hls.min.js" defer></script>
+  <script src="/sync.js" defer></script>
+</body>
+</html>

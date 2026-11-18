@@ -1,0 +1,18 @@
+VOD/HUB – lokaler VOD-Server mit Freigabe
+
+1. Entpacke den Ordner vollständig.
+2. Passe in Starten.bat die Zeile VOD_FOLDER an oder lege .vod_folder.txt mit dem Videoordner an.
+3. Python 3.10+ und FFmpeg/FFprobe müssen im Windows-PATH liegen.
+4. Doppelklicke Starten.bat.
+5. Der lokale Browser öffnet sich unter http://127.0.0.1:8787
+
+Für den Link an Freunde:
+
+1. cloudflared muss installiert und im Windows-PATH sein.
+2. Optional discord_webhook.txt aus discord_webhook.txt.example kopieren und den Webhook eintragen.
+3. Freigabe starten.bat doppelklicken.
+4. Den ausgegebenen vollständigen HTTPS-Link teilen.
+5. Das Freigabe-Fenster offen lassen.
+
+Dieses Paket enthält keinen Live-Modus, keine Webcam-/Desktop-Aufnahme und keinen OBS-Workflow.
+Die Freigabe ist nur ein Tunnel für den normalen VOD-Server.
